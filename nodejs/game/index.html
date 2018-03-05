@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!--<meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">-->
+
+    <title>Game</title>
+    <link rel="stylesheet" href="/game/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<div id="room" class="app">
+    <div class="room-btn" id="create-room">创建房间</div>
+    <div class="room-btn">
+        <input id="room-id"/>
+        <span id="room-btn">加入房间</span>
+    </div>
+</div>
+
+<div id="ready" class="app">
+    <div class="show-room-id">房间号为:<span id="show-room-id"></span></div>
+    <div id="ready-text">等待对手</div>
+</div>
+
+<div id="game" class="app">
+    <div class="game-box">
+        <div class="time-div" id="time-div"></div>
+        <div id="your-content" class="content"></div>
+        <div id="my-content" class="content"></div>
+    </div>
+</div>
+</body>
+<script src="/game/index.js"></script>
+</html>

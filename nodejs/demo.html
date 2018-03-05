@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>api-demo</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+api-demo
+
+</body>
+<script>
+    var socket = io.connect('/demo');
+    socket.send('my message');
+    socket.emit('update', 'data');
+
+    socket.on('update', function (msg) {
+        console.log('msg', msg);
+    });
+
+    socket.emit('addRoom', null);
+    socket.on('room', function (id) {
+        console.log(id);
+        socket.emit(id);
+    });
+
+</script>
+</html>

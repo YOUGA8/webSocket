@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>video</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+video-demo
+<video id="video" style="width: 200px; opacity: .1"></video>
+<video id="video2"></video>
+
+<!--1.调起相册-->
+
+<input type="file" accept="image/*"/>2
+
+<!--2.调起摄像头-->
+
+<input type="file" capture="camera" accept="image/*"/>
+
+</body>
+<script>
+
+    var socket = io.connect('/video');
+
+
+    var videoObj = {
+        "video": true
+    };
+
+    var video = document.getElementById('video');
+    var video2 = document.getElementById('video2');
+
+        if(navigator.getUserMedia){
+        navigator.getUserMedia(videoObj, function (v) {
+            console.log('sss', v);
+            var src = window.URL.createObjectURL(v);
+//            console.log('src', src);
+            video.src = src;
+
+//            video.srcObject = v;
+
+            socket.send(src);
+            video.play();
+        }, function () {
+            console.log('get video error');
+        });
+    }
+
+    socket.on('video', function (src) {
+
+        console.log(src);
+
+        video2.src = src;
+        video2.play();
+    })
+</script>
+</html>

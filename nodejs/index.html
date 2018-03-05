@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <title>node webSocket</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            position: fixed;
+        }
+
+        #red {
+            background-color: red;
+            top: 0;
+            left: 200px;
+        }
+
+        #blue {
+            background-color: blue;
+            top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="red" x="200"></div>
+<div id="blue"></div>
+
+</body>
+<script>
+    var socket = io.connect();
+    socket.on('xx', function (msg) {
+        console.log('xx:', msg)
+    });
+    socket.on('message', function (msg) {
+        console.log('msg', msg)
+    });
+    socket.on('disconnect', function () {
+        console.log('disconnect')
+    });
+
+    document.documentElement.onclick = function () {
+        socket.send('666');
+    }
+
+    var red = document.getElementById('red');
+    red.ontouchstart = function (start) {
+        var startX = start.touches[0].pageX;
+        var startY = start.touches[0].pageY;
+        this.ontouchmove = function (e) {
+            var x = e.touches[0].pageX - startX;
+            var y = e.touches[0].pageY - startY;
+
+            x = Math.floor(this.getAttribute('x') - '' + x);
+            y = Math.floor(this.getAttribute('y') - '' + y);
+
+            this.style.left = x + 'px';
+            this.style.top = y + 'px';
+
+            socket.send(JSON.stringify({red: {x: x, y: y}}));
+
+        }
+    }
+    red.ontouchend = function () {
+        this.setAttribute('x', this.style.left.match(/^\d+/));
+        this.setAttribute('y', this.style.top.match(/^\d+/));
+        this.touchmove = null;
+    }
+
+    var blue = document.getElementById('blue');
+    blue.ontouchstart = function (start) {
+        var startX = start.touches[0].pageX;
+        var startY = start.touches[0].pageY;
+        this.ontouchmove = function (e) {
+            var x = e.touches[0].pageX - startX;
+            var y = e.touches[0].pageY - startY;
+
+            x = Math.floor(this.getAttribute('x') - '' + x);
+            y = Math.floor(this.getAttribute('y') - '' + y);
+
+            this.style.left = x + 'px';
+            this.style.top = y + 'px';
+
+            socket.send(JSON.stringify({blue: {x: x, y: y}}));
+        }
+    }
+    blue.ontouchend = function () {
+        this.setAttribute('x', this.style.left.match(/^\d+/));
+        this.setAttribute('y', this.style.top.match(/^\d+/));
+        this.touchmove = null;
+    }
+
+    socket.on('refresh', function (json) {
+        var data = JSON.parse(json);
+
+        if(data.red){
+            red.style.left = data.red.x + 'px';
+            red.style.top = data.red.y + 'px';
+            red.setAttribute('x', data.red.x);
+            red.setAttribute('y', data.red.y);
+        }else if(data.blue){
+            blue.style.left = data.blue.x + 'px';
+            blue.style.top = data.blue.y + 'px';
+            blue.setAttribute('x', data.blue.x);
+            blue.setAttribute('y', data.blue.y);
+        }
+
+    });
+
+</script>
+</html>
