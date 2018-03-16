@@ -18,6 +18,7 @@ function getNextArray() {
 module.exports = function (io) {
 
     var rooms = [];
+    var loggingUser = {};
     var last = -2;
     io.on('connection', function (socket) {
         socket.on('createRoom', function () {
@@ -28,6 +29,9 @@ module.exports = function (io) {
                 my: getNextArray()
             };
             socket.join(id);
+            loggingUser[socket.id] = {
+                roomId: id
+            };
             socket.emit('createRoom', id);
         });
 
@@ -41,6 +45,9 @@ module.exports = function (io) {
                 socket.emit('joinRoom', id);
                 socket.broadcast.to(id).emit('join');
                 rooms[id].sockets.push(socket.id);
+                loggingUser[socket.id] = {
+                    roomId: id
+                };
             }
         });
 
@@ -77,7 +84,7 @@ module.exports = function (io) {
                         your[your.indexOf(key - '')] = {open: colors[key]};
                     }
                     last = key;
-                    socket.broadcast.emit('canClick', true);
+                    socket.broadcast.to(id).emit('canClick');
                 } else {
                     socket.emit('canClick', 'error');
                 }
@@ -88,6 +95,19 @@ module.exports = function (io) {
             io.sockets[rooms[id].sockets[1]].emit('running', my, your);
             io.sockets[rooms[id].sockets[0]].emit('running', your, my);
         });
+
+        socket.on('disconnect', function () {
+            var id = loggingUser[socket.id] && loggingUser[socket.id].roomId;
+            if (id) {
+                if (rooms[id].sockets.length === 2 && rooms[id].sockets.indexOf(socket.id) != -1) {
+                    rooms[id].sockets.splice(rooms[id].sockets.indexOf(socket.id), 1);
+                    delete loggingUser[socket.id];
+                    socket.broadcast.to(id).emit('outRoom');
+                } else {
+                    rooms.splice(loggingUser[socket.id].roomId, 1);
+                }
+            }
+        })
 
     });
 };

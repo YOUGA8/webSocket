@@ -86,15 +86,23 @@
         }
         var key = e.target.getAttribute('key');
         if (key) {
-            console.log(_roomId, key);
             socket.emit('click', _roomId, key);
             currentDiv = e.target;
             canClick = false;
         }
     }
 
+    socket.on('outRoom', function() {
+        canClick = true;
+        setError(document.body);
+        gid('show-room-id').innerHTML = _roomId;
+        gid('ready-text').innerHTML = '对手已退出房间';
+        gid('room').style.display = 'none';
+        gid('ready').style.display = 'block';
+        gid('game').style.display = 'none';
+    });
+
     socket.on('disconnect', function() {
-        socket.emit('dis', '123');
         console.log("与服务其断开");
     });
 
